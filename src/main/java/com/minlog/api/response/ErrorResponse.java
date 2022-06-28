@@ -1,5 +1,6 @@
 package com.minlog.api.response;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -24,27 +25,15 @@ public class ErrorResponse {
     private final String code;
     private final String message;
     private Map<String, String> validation;
-//    private List<ValidationTuple> validation;
 
-
+    @Builder
     public ErrorResponse(String code, String message) {
         this.code = code;
         this.message = message;
         this.validation = new HashMap<>();
-//        this.validation = new ArrayList<>();
     }
 
     public void addValidation(String field, String errorMessage) {
         validation.put(field, errorMessage);
-//        ValidationTuple tuple = new ValidationTuple(field, errorMessage);
-//        validation.add(tuple);
     }
-
-
-//    @Getter
-//    @RequiredArgsConstructor
-//    private class ValidationTuple {
-//        private final String fieldName;
-//        private final String errorMessage;
-//    }
 }
