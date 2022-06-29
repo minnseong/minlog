@@ -81,5 +81,24 @@ class PostControllerTest {
 
         assertEquals(1L, postRepository.count());
     }
+
+    @Test
+    public void getTest() throws Exception {
+
+        Post post = Post.builder()
+                .title("제목")
+                .content("본문")
+                .build();
+        postRepository.save(post);
+
+        mockMvc.perform(get("/posts/{postId}", post.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(post.getId()))
+                .andExpect(jsonPath("$.title").value("제목"))
+                .andExpect(jsonPath("$.content").value("본문"))
+                .andDo(print());
+    }
+
 }
 

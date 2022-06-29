@@ -3,6 +3,7 @@ package com.minlog.api.controller;
 import com.minlog.api.domain.Post;
 import com.minlog.api.domain.User;
 import com.minlog.api.request.PostCreate;
+import com.minlog.api.response.PostResponse;
 import com.minlog.api.service.PostService;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,23 +28,11 @@ public class PostController {
         return postService.write(postCreate);
     }
 
-
-    @GetMapping("/home")
-    public String getHome() {
-        return "request home";
+    @GetMapping("/posts/{postId}")
+    public PostResponse get(@PathVariable(name = "postId") Long id) {
+        PostResponse post = postService.get(id);
+        return post;
     }
 
-
-    @PostMapping("/home")
-    public UserDto postHome(@RequestBody @Valid User user) {
-        return new UserDto(user.getUserId(), user.getPassword());
-    }
-
-    @Data
-    @AllArgsConstructor
-    static class UserDto {
-        private String id;
-        private String pwd;
-    }
 }
 
