@@ -4,21 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minlog.api.domain.Post;
 import com.minlog.api.repository.PostRepository;
 import com.minlog.api.request.PostCreate;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -99,6 +96,36 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.content").value("본문"))
                 .andDo(print());
     }
+
+    @Test
+    public void getAllTest() throws Exception {
+
+        Post post1 = Post.builder()
+                .title("제목1")
+                .content("본문1")
+                .build();
+        postRepository.save(post1);
+
+        Post post2 = Post.builder()
+                .title("제목2")
+                .content("본문2")
+                .build();
+        postRepository.save(post2);
+
+        mockMvc.perform(get("/posts")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[0].id").value(post1.getId()))
+                .andExpect(jsonPath("$[0].title").value("제목1"))
+                .andExpect(jsonPath("$[0].content").value("본문1"))
+                .andExpect(jsonPath("$[1].id").value(post2.getId()))
+                .andExpect(jsonPath("$[1].title").value("제목2"))
+                .andExpect(jsonPath("$[1].content").value("본문2"))
+                .andDo(print());
+
+    }
+
 
 }
 

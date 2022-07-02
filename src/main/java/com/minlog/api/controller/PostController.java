@@ -1,15 +1,15 @@
 package com.minlog.api.controller;
 
 import com.minlog.api.domain.Post;
-import com.minlog.api.domain.User;
 import com.minlog.api.request.PostCreate;
 import com.minlog.api.response.PostResponse;
 import com.minlog.api.service.PostService;
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -28,11 +28,16 @@ public class PostController {
         return postService.write(postCreate);
     }
 
+    // 조회 API - 단건 조회 API
     @GetMapping("/posts/{postId}")
     public PostResponse get(@PathVariable(name = "postId") Long id) {
         PostResponse post = postService.get(id);
         return post;
     }
 
+    @GetMapping("/posts")
+    public List<PostResponse> getList() {
+        return postService.getList();
+    }
 }
 

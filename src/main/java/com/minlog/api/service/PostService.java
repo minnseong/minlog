@@ -6,9 +6,13 @@ import com.minlog.api.request.PostCreate;
 import com.minlog.api.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,5 +41,22 @@ public class PostService {
                 .build();
 
         return postResponse;
+    }
+
+    // 글이 너무 많은 경우 -> 비용이 너무 많이 든다.
+    // 글이 -> 100,000,000 -> DB 글 모두 조회하는 경우 -> DB가 뻗을 수 있다.
+    // DB -> 애플리케이션 서버로 전달하는 시간, 트래픽 비용 등이 많이 발생할 수 있다.
+    public List<PostResponse> getList() {
+        return postRepository.findAll().stream()
+                .map(PostResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostResponse> getListByPage(int page) {
+        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC,"id"));
+
+        return postRepository.findAll(pageable).stream()
+                .map(PostResponse::new)
+                .collect(Collectors.toList());
     }
 }
