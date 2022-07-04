@@ -2,6 +2,7 @@ package com.minlog.api.controller;
 
 import com.minlog.api.domain.Post;
 import com.minlog.api.request.PostCreate;
+import com.minlog.api.request.PostSearch;
 import com.minlog.api.response.PostResponse;
 import com.minlog.api.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,8 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public List<PostResponse> getList() {
-        return postService.getList();
+    public List<PostResponse> getList(@ModelAttribute PostSearch postSearch) {
+        return postService.getListByPage(postSearch);
     }
 }
 

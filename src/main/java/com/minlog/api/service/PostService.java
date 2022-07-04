@@ -3,12 +3,10 @@ package com.minlog.api.service;
 import com.minlog.api.domain.Post;
 import com.minlog.api.repository.PostRepository;
 import com.minlog.api.request.PostCreate;
+import com.minlog.api.request.PostSearch;
 import com.minlog.api.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,11 +50,15 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public List<PostResponse> getListByPage(int page) {
-        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC,"id"));
+    public List<PostResponse> getListByPage(PostSearch postSearch) {
+//        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC,"id"));
 
-        return postRepository.findAll(pageable).stream()
+//        return postRepository.findAll(pageable).stream()
+//                .map(PostResponse::new)
+//                .collect(Collectors.toList());//
+        return postRepository.getList(postSearch).stream()
                 .map(PostResponse::new)
                 .collect(Collectors.toList());
+
     }
 }

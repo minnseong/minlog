@@ -11,6 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -126,6 +130,43 @@ class PostControllerTest {
 
     }
 
+    @Test
+    public void getByPagingTest() throws Exception {
 
+        List<Post> requestPosts = IntStream.range(0, 20)
+                .mapToObj(i -> Post.builder()
+                        .title("제목 - " + i)
+                        .content("본문 - " + i)
+                        .build()).collect(Collectors.toList());
+
+        postRepository.saveAll(requestPosts);
+
+        mockMvc.perform(get("/posts?page=1&size=10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andExpect(jsonPath("$[0].id").value(20))
+                .andExpect(jsonPath("$[0].title").value("제목 - 19"))
+                .andExpect(jsonPath("$[0].content").value("본문 - 19"))
+                .andDo(print());
+    }
+
+    @Test
+    public void getByPaging0Test() throws Exception {
+
+        List<Post> requestPosts = IntStream.range(0, 20)
+                .mapToObj(i -> Post.builder()
+                        .title("제목 - " + i)
+                        .content("본문 - " + i)
+                        .build()).collect(Collectors.toList());
+
+        postRepository.saveAll(requestPosts);
+
+        mockMvc.perform(get("/posts?page=0&size=10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andDo(print());
+    }
 }
 

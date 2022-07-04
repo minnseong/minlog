@@ -3,6 +3,7 @@ package com.minlog.api.service;
 import com.minlog.api.domain.Post;
 import com.minlog.api.repository.PostRepository;
 import com.minlog.api.request.PostCreate;
+import com.minlog.api.request.PostSearch;
 import com.minlog.api.response.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +88,7 @@ class PostServiceTest {
     @Test
     public void selectByPageTest() {
 
-        List<Post> requestPosts = IntStream.range(0, 30)
+        List<Post> requestPosts = IntStream.range(0, 20)
                 .mapToObj(i -> Post.builder()
                             .title("제목 - " + i)
                             .content("본문 - " + i)
@@ -95,10 +96,15 @@ class PostServiceTest {
 
         postRepository.saveAll(requestPosts);
 
-        List<PostResponse> list = postService.getListByPage(0);
+        PostSearch postSearch = PostSearch.builder()
+                .page(1)
+                .build();
 
-        assertEquals(5L, list.size());
-        assertEquals("제목 - 29", list.get(0).getTitle());
-        assertEquals("제목 - 25", list.get(4).getTitle());
+        List<PostResponse> list = postService.getListByPage(postSearch);
+
+        assertEquals(10L, list.size());
+        assertEquals("제목 - 19", list.get(0).getTitle());
+        assertEquals("제목 - 10", list.get(9).getTitle());
+//        assertEquals("제목 - 25", list.get(4).getTitle());
     }
 }
