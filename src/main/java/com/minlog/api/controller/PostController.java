@@ -27,6 +27,7 @@ public class PostController {
         //          client에는 수신한 id를 글 조회 API를 통해서 데이터를 수신받음
         // Case3. 응답 필요 없음 -> 클라이언트에서 모든 Post 데이터 context를 잘 관리함.
         log.info("response = {}", postService.write(postCreate));
+        postCreate.validate();
         return postService.write(postCreate);
     }
 

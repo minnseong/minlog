@@ -1,6 +1,7 @@
 package com.minlog.api.service;
 
 import com.minlog.api.domain.Post;
+import com.minlog.api.exception.PostNotFound;
 import com.minlog.api.repository.PostRepository;
 import com.minlog.api.request.PostCreate;
 import com.minlog.api.request.PostEdit;
@@ -15,8 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class PostServiceTest {
@@ -51,18 +51,40 @@ class PostServiceTest {
 
     @Test
     public void selectTest() {
-        PostCreate response = PostCreate.builder()
-                .title("0123456789101112")
+        Post post = Post.builder()
+                .title("0123456789")
                 .content("내용입니다.")
                 .build();
-        postService.write(response);
 
-        PostResponse post = postService.get(1L);
+        postRepository.save(post);
 
-        assertNotNull(post);
+        PostResponse postResponse = postService.get(post.getId());
+
+        assertNotNull(postResponse);
         // title의 길이를 10개 까지!
-        assertEquals("0123456789", post.getTitle());
-        assertEquals("내용입니다.", post.getContent());
+        assertEquals("0123456789", postResponse.getTitle());
+        assertEquals("내용입니다.", postResponse.getContent());
+    }
+
+    @Test
+    public void selectFailedTest() {
+
+        Post post = Post.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+
+        postRepository.save(post);
+
+        assertThrows(PostNotFound.class, ()->{
+            postService.get(post.getId()+1L);
+        });
+
+//        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+//                () -> {postService.get(post.getId()+1L);}
+//        , "예외처리가 잘못 되었어요.");
+//
+//        assertEquals("존재하지 않는 글입니다.", e.getMessage());
     }
 
     @Test

@@ -5,6 +5,8 @@ import com.minlog.api.domain.Post;
 import com.minlog.api.repository.PostRepository;
 import com.minlog.api.request.PostCreate;
 import com.minlog.api.request.PostEdit;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,29 +40,34 @@ class PostControllerTest {
     @Autowired
     private PostRepository postRepository;
 
-    @Test
-    public void getHome() throws Exception {
-        mockMvc.perform(get("/home"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("request home"))
-                .andDo(print());
+    @BeforeEach
+    void clean() {
+        postRepository.deleteAll();
     }
 
-    @Test
-    public void postHome() throws Exception {
-        String requestJson = "{\"userId\":\"\", \"password\": \"1234\"}";
-        String responseJson = "{\"id\":\"minnseong\",\"pwd\":\"1234\"}";
-
-        mockMvc.perform(post("/home")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isBadRequest())
-//                .andExpect(MockMvcResultMatchers.content().string(responseJson))
-                .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("잘못된 요청입니다."))
-                .andExpect(jsonPath("$.validation.userId").value("must not be blank"))
-                .andDo(print());
-    }
+//    @Test
+//    public void getHome() throws Exception {
+//        mockMvc.perform(get("/home"))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string("request home"))
+//                .andDo(print());
+//    }
+//
+//    @Test
+//    public void postHome() throws Exception {
+//        String requestJson = "{\"userId\":\"\", \"password\": \"1234\"}";
+//        String responseJson = "{\"id\":\"minnseong\",\"pwd\":\"1234\"}";
+//
+//        mockMvc.perform(post("/home")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(requestJson))
+//                .andExpect(status().isBadRequest())
+////                .andExpect(MockMvcResultMatchers.content().string(responseJson))
+//                .andExpect(jsonPath("$.code").value("400"))
+//                .andExpect(jsonPath("$.message").value("잘못된 요청입니다."))
+//                .andExpect(jsonPath("$.validation.userId").value("must not be blank"))
+//                .andDo(print());
+//    }
 
     @Test
     public void writeTest() throws Exception {
@@ -204,6 +211,36 @@ class PostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
+    }
+
+    @Test
+    public void getFailedTest() throws Exception {
+
+        mockMvc.perform(get("/posts/{postId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("제목에는 '바보'가 표함될수 없다.")
+    public void write2Test() throws Exception {
+
+        PostCreate request = PostCreate.builder()
+                .title("바보입니다..")
+                .content("내용입니다.")
+                .build();
+
+        // ObjectMapper 중요 !!!
+        String requestJson = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(post("/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
     }
 }
 
